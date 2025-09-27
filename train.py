@@ -1,3 +1,4 @@
+# train.py
 import pandas as pd
 import numpy as np
 import mlflow
@@ -59,7 +60,3 @@ with mlflow.start_run(run_name="linear_regression"):
     print("Model trained, logged to MLflow, and saved locally as model.pkl.")
     print(f"MSE: {mse}")
     print(f"R2: {r2}")
-
-
-#mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --host 127.0.0.1 --port 5000
-# mlflow-artifacts:/438705199425615622/models/m-1a7cf8ede25a4b0fb35c94ca3e90648f/artifacts/MLmodel
