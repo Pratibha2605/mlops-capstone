@@ -1,0 +1,6 @@
+[core]
+    remote = localremote
+['remote "localremote"']
+    url = ../../dvc_remote
+['remote "s3remote"']
+    url = s3://mlops-pratibha-test
