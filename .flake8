@@ -1,0 +1,3 @@
+[flake8]
+exclude = mlops2
+max-line-length = 120

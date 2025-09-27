@@ -1,29 +1,64 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-import joblib
+from sklearn.metrics import mean_squared_error, r2_score
 import mlflow
-import mlflow.sklearn
+import joblib
 
-# TODO: Add MLflow tracking params, metrics, and model logging
+# -------------------------------
+# Load dataset
+# -------------------------------
+data = pd.read_csv("data/housing.csv")  # adjust path if needed
 
-def main():
-    df = pd.read_csv("data/housing.csv")
-    X = df[["area"]]
-    y = df["price"]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Features and target
+X = data[["area"]]
+y = data["price"]
 
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+
+# -------------------------------
+# MLflow configuration
+# -------------------------------
+mlflow.set_tracking_uri("http://127.0.0.1:5000")  # MLflow server
+mlflow.set_experiment("mlops-capstone")
+
+
+# Enable MLflow autologging
+mlflow.autolog()
+
+
+# -------------------------------
+# Train and log model
+# -------------------------------
+with mlflow.start_run(run_name="linear_regression"):
+    # Define and train model
     model = LinearRegression()
     model.fit(X_train, y_train)
 
-    score = model.score(X_test, y_test)
-    print("Model R^2 Score:", score)
+    # Predictions
+    y_pred = model.predict(X_test)
 
-    # Save model locally
+    # Metrics
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+
+    # Log params and metrics manually (optional)
+    mlflow.log_param("model_type", "LinearRegression")
+    mlflow.log_metric("mse", mse)
+    mlflow.log_metric("r2", r2)
+
+    # Log model to MLflow
+    mlflow.sklearn.log_model(model, artifact_path="linear_regression_model")
+
+    # Save locally for FastAPI
     joblib.dump(model, "model.pkl")
 
-    # TODO: Log params, metrics, and model with MLflow
-
-if __name__ == "__main__":
-    main()
+    print("Model trained, logged to MLflow, and saved locally as model.pkl.")
+    print(f"MSE: {mse}")
+    print(f"R2: {r2}")
